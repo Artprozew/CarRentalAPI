@@ -1,4 +1,6 @@
-﻿using CarRental.API.Interfaces;
+﻿using AutoMapper;
+using CarRental.API.DTOs;
+using CarRental.API.Interfaces;
 using CarRental.API.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +11,12 @@ namespace CarRental.API.Controllers
     public class CustomerController : Controller
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly IMapper _mapper;
 
-        public CustomerController(ICustomerRepository customerRepository)
+        public CustomerController(ICustomerRepository customerRepository, IMapper mapper)
         {
             _customerRepository = customerRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -31,7 +35,9 @@ namespace CarRental.API.Controllers
                 return NotFound("Customer not found");
             }
 
-            return Ok(customer);
+            CustomerDTO customerDTO = _mapper.Map<CustomerDTO>(customer);
+
+            return Ok(customerDTO);
         }
 
         [HttpPost]

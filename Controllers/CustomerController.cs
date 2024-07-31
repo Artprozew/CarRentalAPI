@@ -22,7 +22,10 @@ namespace CarRental.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
-            return Ok(await _customerRepository.GetAll());
+            IEnumerable<Customer> customer = await _customerRepository.GetAll();
+            IEnumerable<CustomerDTO> customersDTO = _mapper.Map<IEnumerable<CustomerDTO>>(customer);
+
+            return Ok(customersDTO);
         }
 
         [HttpGet("{id}")]
@@ -41,9 +44,12 @@ namespace CarRental.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> SetCustomer(Customer customer)
+        public async Task<ActionResult> SetCustomer(CustomerDTO customerDTO)
         {
+            Customer customer = _mapper.Map<Customer>(customerDTO);
+
             _customerRepository.Create(customer);
+
             if (await _customerRepository.SaveAllAsync())
             {
                 return Ok("Customer registered successfully");
@@ -53,8 +59,10 @@ namespace CarRental.API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> UpdateCustomer(Customer customer)
+        public async Task<ActionResult> UpdateCustomer(CustomerDTO customerDTO)
         {
+            Customer customer = _mapper.Map<Customer>(customerDTO);
+
             _customerRepository.Update(customer);
             if (await _customerRepository.SaveAllAsync())
             {

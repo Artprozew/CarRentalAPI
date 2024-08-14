@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CarRental.API.DTOs;
-using CarRental.API.Models;
+using CarRental.Domain.Entities;
 
 namespace CarRental.API.Mappings
 {

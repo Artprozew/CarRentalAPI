@@ -1,4 +1,4 @@
-﻿using CarRental.API.Models;
+﻿using CarRental.Domain.Entities;
 
 namespace CarRental.API.Interfaces
 {

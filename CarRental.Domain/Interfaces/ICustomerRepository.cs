@@ -1,14 +1,14 @@
 ﻿using CarRental.Domain.Entities;
 
-namespace CarRental.API.Interfaces
+namespace CarRental.Domain.Interfaces
 {
     public interface ICustomerRepository
     {
-        void Create(Customer customer);
-        void Update(Customer customer);
-        void Delete(Customer customer);
-        Task<Customer> SelectByPrimaryKey(int id);
-        Task<IEnumerable<Customer>> GetAll();
+        Task<Customer> CreateAsync(Customer customer);
+        Task<Customer> UpdateAsync(Customer customer);
+        Task<Customer?> DeleteAsync(int id);
+        Task<Customer?> GetAsync(int id);
+        Task<IEnumerable<Customer>> GetAllAsync();
         Task<bool> SaveAllAsync();
     }
 }

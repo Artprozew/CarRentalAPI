@@ -1,23 +1,14 @@
-using CarRental.API.Interfaces;
-using CarRental.API.Mappings;
-using CarRental.API.Models;
-using CarRental.API.Repositories;
-using Microsoft.EntityFrameworkCore;
+using CarRental.Infra.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Add services to the container.
 
-builder.Services.AddDbContext<ControlCarRentalContext>(options =>
-{
-    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(typeof(EntitiesToDTOMappingProfile));
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 var app = builder.Build();

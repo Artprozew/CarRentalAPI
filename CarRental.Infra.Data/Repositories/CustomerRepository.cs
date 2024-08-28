@@ -1,46 +1,59 @@
-﻿using CarRental.API.Interfaces;
-using CarRental.API.Models;
+﻿using CarRental.Domain.Entities;
+using CarRental.Domain.Interfaces;
+using CarRental.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace CarRental.API.Repositories
+namespace CarRental.Infra.Data
 {
     public class CustomerRepository : ICustomerRepository
     {
-        private readonly ControlCarRentalContext _controlCarRentalContext;
+        private readonly ApplicationDbContext _context;
 
-        public CustomerRepository(ControlCarRentalContext context)
+        public CustomerRepository(ApplicationDbContext context)
         {
-            _controlCarRentalContext = context;
+            _context = context;
         }
 
-        public void Delete(Customer customer)
+        public async Task<Customer> CreateAsync(Customer customer)
         {
-            _controlCarRentalContext.Customers.Remove(customer);
+            _context.Customer.Add(customer);
+            await _context.SaveChangesAsync();
+            return customer;
         }
 
-        public async Task<IEnumerable<Customer>> GetAll()
+        public async Task<Customer?> DeleteAsync(int id)
         {
-            return await _controlCarRentalContext.Customers.ToListAsync();
+            Customer? customer = await _context.Customer.FindAsync(id);
+
+            if (customer != null)
+            {
+                _context.Customer.Remove(customer);
+                await _context.SaveChangesAsync();
+            }
+
+            return customer;
+        }
+
+        public async Task<Customer> UpdateAsync(Customer customer)
+        {
+            _context.Update(customer);
+            await _context.SaveChangesAsync();
+            return customer;
+        }
+
+        public async Task<IEnumerable<Customer>> GetAllAsync()
+        {
+            return await _context.Customer.ToListAsync();
         }
 
         public async Task<bool> SaveAllAsync()
         {
-            return await _controlCarRentalContext.SaveChangesAsync() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<Customer> SelectByPrimaryKey(int id)
+        public async Task<Customer?> GetAsync(int id)
         {
-            return await _controlCarRentalContext.Customers.Where(x => x.CustomerId == id).FirstOrDefaultAsync();
-        }
-
-        public void Create(Customer customer)
-        {
-            _controlCarRentalContext.Customers.Add(customer);
-        }
-
-        public void Update(Customer customer)
-        {
-            _controlCarRentalContext.Entry(customer).State = EntityState.Modified;
+            return await _context.Customer.Where(x => x.CustomerId == id).FirstOrDefaultAsync();
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using CarRental.API.DTOs;
+using CarRental.Application.DTOs;
 using CarRental.Domain.Entities;
 
-namespace CarRental.API.Mappings
+namespace CarRental.Application.Mappings
 {
     public class EntitiesToDTOMappingProfile : Profile
     {

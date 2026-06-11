@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace CarRental.API.DTOs
+namespace CarRental.Application.DTOs
 {
     public class CustomerDTO
     {
@@ -10,29 +9,22 @@ namespace CarRental.API.DTOs
         [Required]
         [StringLength(200)]
         [MinLength(3)]
-        [Unicode(false)]
-        public string? CustomerName { get; set; }
+        public string? Name { get; set; }
         [Required]
-        [StringLength(14)]
-        [MinLength(14)]
-        [Unicode(false)]
+        [StringLength(11)]
+        [MinLength(11)]
         public string? Cpf { get; set; }
         [Required]
         [StringLength(200)]
-        [Unicode(false)]
         public string? Address { get; set; }
         [Required]
         [StringLength(100)]
-        [Unicode(false)]
         public string? City { get; set; }
         [Required]
         [StringLength(100)]
-        [Unicode(false)]
         public string? District { get; set; }
         [Required]
         [StringLength(14)]
-        [Unicode(false)]
         public string? PhoneNumber { get; set; }
-
     }
 }

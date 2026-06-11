@@ -1,7 +1,9 @@
 ﻿using CarRental.Domain.Entities;
 using CarRental.Domain.Interfaces;
+using CarRental.Domain.Pagination;
 using CarRental.Infra.Data.Context;
-using System.Data.Entity;
+using CarRental.Infra.Data.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarRental.Infra.Data.Repositories
 {
@@ -21,7 +23,7 @@ namespace CarRental.Infra.Data.Repositories
             return user;
         }
 
-        public async Task<User?> DeleteAsync(int id)
+        public async Task<User?> DeleteAsync(uint id)
         {
             User? user = await _context.User.FindAsync(id);
 
@@ -41,9 +43,10 @@ namespace CarRental.Infra.Data.Repositories
             return user;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<PagedList<User>> GetAllAsync(int pageNumber, int pageSize)
         {
-            return await _context.User.ToListAsync();
+            IQueryable<User> query = _context.User.AsQueryable();
+            return await PaginationHelper.CreateAsync(query, pageNumber, pageSize);
         }
 
         public async Task<bool> SaveAllAsync()
@@ -53,7 +56,12 @@ namespace CarRental.Infra.Data.Repositories
 
         public async Task<User?> GetAsync(int id)
         {
-            return await _context.User.Where(x => x.UserId == id).FirstOrDefaultAsync();
+            return await _context.User.Where(x => x.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> RegisteredUserExistsAsync()
+        {
+            return await _context.User.AnyAsync();
         }
     }
 }

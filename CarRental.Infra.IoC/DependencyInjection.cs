@@ -10,6 +10,10 @@ using CarRental.Application.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using CarRental.Infra.Data.Repositories;
+using CarRental.Domain.Account;
+using CarRental.Infra.Data.Identity;
+using CarRentalDTO.Application.Interfaces;
 
 namespace CarRental.Infra.IoC
 {
@@ -48,9 +52,19 @@ namespace CarRental.Infra.IoC
 
             // Repositories
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICarRepository, CarRepository>();
+            services.AddScoped<IRentalRepository, RentalRepository>();
+            services.AddScoped<ISystemRepository, SystemRepository>();
 
             // Services
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICarService, CarService>();
+            services.AddScoped<IRentalService, RentalService>();
+            services.AddScoped<ISystemService, SystemService>();
+
+            services.AddScoped<IAuthenticate, AuthenticateService>();
 
             return services;
         }

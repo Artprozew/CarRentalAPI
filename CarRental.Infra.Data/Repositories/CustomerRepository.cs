@@ -1,6 +1,8 @@
 ﻿using CarRental.Domain.Entities;
 using CarRental.Domain.Interfaces;
+using CarRental.Domain.Pagination;
 using CarRental.Infra.Data.Context;
+using CarRental.Infra.Data.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarRental.Infra.Data
@@ -21,7 +23,7 @@ namespace CarRental.Infra.Data
             return customer;
         }
 
-        public async Task<Customer?> DeleteAsync(int id)
+        public async Task<Customer?> DeleteAsync(uint id)
         {
             Customer? customer = await _context.Customer.FindAsync(id);
 
@@ -41,9 +43,10 @@ namespace CarRental.Infra.Data
             return customer;
         }
 
-        public async Task<IEnumerable<Customer>> GetAllAsync()
+        public async Task<PagedList<Customer>> GetAllAsync(int pageNumber, int pageSize)
         {
-            return await _context.Customer.ToListAsync();
+            IQueryable<Customer> query = _context.Customer.AsQueryable();
+            return await PaginationHelper.CreateAsync(query, pageNumber, pageSize);
         }
 
         public async Task<bool> SaveAllAsync()

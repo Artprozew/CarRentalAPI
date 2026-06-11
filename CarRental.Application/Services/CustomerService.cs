@@ -3,6 +3,7 @@ using CarRental.Application.DTOs;
 using CarRental.Application.Interfaces;
 using CarRental.Domain.Entities;
 using CarRental.Domain.Interfaces;
+using CarRental.Domain.Pagination;
 
 namespace CarRental.Application.Services
 {
@@ -21,10 +22,11 @@ namespace CarRental.Application.Services
         {
             Customer customer = _mapper.Map<Customer>(customerDTO);
             Customer createdCustomer = await _customerRepository.CreateAsync(customer);
+
             return _mapper.Map<CustomerDTO>(createdCustomer);
         }
 
-        public async Task<CustomerDTO> DeleteAsync(int id)
+        public async Task<CustomerDTO> DeleteAsync(uint id)
         {
             Customer? deletedCustomer = await _customerRepository.DeleteAsync(id);
             return _mapper.Map<CustomerDTO>(deletedCustomer);
@@ -33,13 +35,16 @@ namespace CarRental.Application.Services
         {
             Customer customer = _mapper.Map<Customer>(customerDTO);
             Customer updatedCustomer = await _customerRepository.UpdateAsync(customer);
+
             return _mapper.Map<CustomerDTO>(updatedCustomer);
         }
 
-        public async Task<IEnumerable<CustomerDTO>> GetAllAsync()
+        public async Task<PagedList<CustomerDTO>> GetAllAsync(int pageNumber, int pageSize)
         {
-            IEnumerable<Customer> customers = await _customerRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<CustomerDTO>>(customers);
+            PagedList<Customer> customers = await _customerRepository.GetAllAsync(pageNumber, pageSize);
+            IEnumerable<CustomerDTO> customersDTOs = _mapper.Map<IEnumerable<CustomerDTO>>(customers);
+
+            return new PagedList<CustomerDTO>(customersDTOs, pageNumber, pageSize, customers.TotalCount);
         }
 
         public async Task<CustomerDTO> GetAsync(int id)

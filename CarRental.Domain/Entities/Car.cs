@@ -1,5 +1,4 @@
-﻿using CarRental.Domain.Entities;
-using CarRental.Domain.Validations;
+﻿using CarRental.Domain.Validations;
 
 namespace CarRental.Domain.Entities
 {

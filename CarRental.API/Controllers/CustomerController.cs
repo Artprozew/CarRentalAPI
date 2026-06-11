@@ -1,44 +1,48 @@
-﻿using AutoMapper;
-using CarRental.API.DTOs;
-using CarRental.API.Interfaces;
-using CarRental.API.Models;
+﻿using CarRental.Domain.Entities;
+using CarRental.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using CarRental.Application.Interfaces;
+using CarRental.Infra.IoC;
+using CarRental.API.Models;
+using CarRental.API.Extensions;
+using CarRental.Domain.Pagination;
 
 namespace CarRental.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // [Authorize] // Requests JWT auth to use the endpoints
     public class CustomerController : Controller
     {
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IMapper _mapper;
+        private readonly ICustomerService _customerService;
+        private readonly IUserService _userService;
 
-        public CustomerController(ICustomerRepository customerRepository, IMapper mapper)
+        public CustomerController(ICustomerService customerService, IUserService userService)
         {
-            _customerRepository = customerRepository;
-            _mapper = mapper;
+            _customerService = customerService;
+            _userService = userService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers([FromQuery]PaginationParams paginationParams)
         {
-            IEnumerable<Customer> customer = await _customerRepository.GetAll();
-            IEnumerable<CustomerDTO> customersDTO = _mapper.Map<IEnumerable<CustomerDTO>>(customer);
+            PagedList<CustomerDTO> customersDTO = await _customerService.GetAllAsync(paginationParams.PageNumber, paginationParams.PageSize);
+
+            Response.AddPaginationHeader(new PaginationHeader
+                (customersDTO.CurrentPage, customersDTO.PageSize, customersDTO.TotalCount, customersDTO.TotalPages));
 
             return Ok(customersDTO);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetCustomerById(int id)
+        public async Task<ActionResult<Customer>> GetCustomerById(int id)
         {
-            Customer customer = await _customerRepository.SelectByPrimaryKey(id);
+            CustomerDTO customerDTO = await _customerService.GetAsync(id);
 
-            if (customer == null)
+            if (customerDTO == null)
             {
                 return NotFound("Customer not found");
             }
-
-            CustomerDTO customerDTO = _mapper.Map<CustomerDTO>(customer);
 
             return Ok(customerDTO);
         }
@@ -46,50 +50,54 @@ namespace CarRental.API.Controllers
         [HttpPost]
         public async Task<ActionResult> SetCustomer(CustomerDTO customerDTO)
         {
-            Customer customer = _mapper.Map<Customer>(customerDTO);
+            customerDTO = await _customerService.CreateAsync(customerDTO);
 
-            _customerRepository.Create(customer);
-
-            if (await _customerRepository.SaveAllAsync())
+            if (customerDTO == null)
             {
-                return Ok("Customer registered successfully");
+                return BadRequest("Error registering customer");
             }
 
-            return BadRequest("Error registering customer");
+            return Ok("Customer registered successfully");
         }
 
         [HttpPut]
         public async Task<ActionResult> UpdateCustomer(CustomerDTO customerDTO)
         {
-            Customer customer = _mapper.Map<Customer>(customerDTO);
+            customerDTO = await _customerService.UpdateAsync(customerDTO);
 
-            _customerRepository.Update(customer);
-            if (await _customerRepository.SaveAllAsync())
+            if (customerDTO == null)
             {
-                return Ok("Customer updated successfully");
+                return BadRequest("Error updating customer");
             }
 
-            return BadRequest("Error updating customer");
+            return Ok("Customer updated successfully");
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCustomer(int id)
+        public async Task<ActionResult> DeleteCustomer(uint id)
         {
-            Customer customer = await _customerRepository.SelectByPrimaryKey(id);
+            int? userId = User.GetId();
 
-            if (customer == null)
+            if (userId == null)
             {
-                return NotFound("Customer not found");
+                return Unauthorized("Not logged in");
             }
 
-            _customerRepository.Delete(customer);
+            UserDTO? user = await _userService.GetAsync(userId.Value);
 
-            if (await _customerRepository.SaveAllAsync())
+            if (!user.IsAdmin)
             {
-                return Ok("Customer deleted successfully");
+                return Unauthorized("Not enough permissions");
             }
 
-            return BadRequest("Error deleting customer");
+            CustomerDTO customerDTO = await _customerService.DeleteAsync(id);
+
+            if (customerDTO == null)
+            {
+                return BadRequest("Error deleting customer");
+            }
+
+            return Ok("Customer deleted successfully");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CarRental.Application.DTOs;
+using CarRental.Domain.Pagination;
 
 namespace CarRental.Application.Interfaces
 {
@@ -6,8 +7,8 @@ namespace CarRental.Application.Interfaces
     {
         Task<CustomerDTO> CreateAsync(CustomerDTO customerDTO);
         Task<CustomerDTO> UpdateAsync(CustomerDTO customerDTO);
-        Task<CustomerDTO> DeleteAsync(int id);
+        Task<CustomerDTO> DeleteAsync(uint id);
         Task<CustomerDTO> GetAsync(int id);
-        Task<IEnumerable<CustomerDTO>> GetAllAsync();
+        Task<PagedList<CustomerDTO>> GetAllAsync(int pageNumber, int pageSize);
     }
 }

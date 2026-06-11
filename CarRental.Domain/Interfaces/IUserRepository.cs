@@ -1,4 +1,5 @@
 ﻿using CarRental.Domain.Entities;
+using CarRental.Domain.Pagination;
 
 namespace CarRental.Domain.Interfaces
 {
@@ -6,8 +7,9 @@ namespace CarRental.Domain.Interfaces
     {
         Task<User> CreateAsync(User user);
         Task<User> UpdateAsync(User user);
-        Task<User?> DeleteAsync(int id);
+        Task<User?> DeleteAsync(uint id);
         Task<User?> GetAsync(int id);
-        Task<IEnumerable<User>> GetAllAsync();
+        Task<PagedList<User>> GetAllAsync(int pageNumber, int pageSize);
+        Task<bool> RegisteredUserExistsAsync();
     }
 }
